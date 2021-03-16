@@ -6,13 +6,18 @@
 #    By: kycho <kycho@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/03/08 17:39:09 by kycho             #+#    #+#              #
-#    Updated: 2021/03/08 17:48:08 by kycho            ###   ########.fr        #
+#    Updated: 2021/03/16 21:45:10 by kycho            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = philo_one
 
-SRCS = main.c
+SRCS = main.c \
+		init.c \
+		execute.c \
+		get_msg.c \
+		check_simul_end.c \
+		utils.c
 OBJS = $(SRCS:.c=.o)
 
 CC = gcc
