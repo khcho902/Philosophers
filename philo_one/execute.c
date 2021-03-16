@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/16 21:35:23 by kycho             #+#    #+#             */
-/*   Updated: 2021/03/16 21:54:45 by kycho            ###   ########.fr       */
+/*   Updated: 2021/03/17 00:20:38 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,7 @@ void	philo_action(t_philo *philo, int type)
 	cur_time = gettimeofday_by_millisec();
 	if (type == EATING)
 	{
-		philo->cnt_of_eat++;
 		philo->time_of_last_eat = cur_time;
-		if (philo->cnt_of_eat == info->num_of_times_each_philo_must_eat)
-			info->num_of_full_philo++;
 	}
 	else if (type == DEAD)
 		info->somebody_dead = TRUE;
@@ -76,6 +73,13 @@ void	eat_proecss(t_philo *philo)
 	philo_action(philo, EATING);
 	pthread_mutex_unlock(&(philo->time_of_last_eat_mutex));
 	less_error_msleep(info->time_to_eat);
+	philo->cnt_of_eat++;
+	if (philo->cnt_of_eat == info->num_of_times_each_philo_must_eat)
+	{
+		pthread_mutex_lock(&(info->num_of_full_philo_mutex));
+		info->num_of_full_philo++;
+		pthread_mutex_unlock(&(info->num_of_full_philo_mutex));
+	}
 	pthread_mutex_unlock(&(info->fork_mutex[philo->fork[0]]));
 	pthread_mutex_unlock(&(info->fork_mutex[philo->fork[1]]));
 }

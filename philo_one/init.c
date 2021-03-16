@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/16 21:23:16 by kycho             #+#    #+#             */
-/*   Updated: 2021/03/16 22:07:08 by kycho            ###   ########.fr       */
+/*   Updated: 2021/03/17 00:14:51 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,5 +69,6 @@ int		init(char **argv, t_simul_info *info)
 	if (init_fork_mutex(info) == ERROR)
 		return (ERROR);
 	pthread_mutex_init(&(info->action_mutex), NULL);
+	pthread_mutex_init(&(info->num_of_full_philo_mutex), NULL);
 	return (SUCCESS);
 }
