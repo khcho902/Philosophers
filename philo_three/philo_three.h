@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/08 17:31:18 by kycho             #+#    #+#             */
-/*   Updated: 2021/03/17 13:55:24 by kycho            ###   ########.fr       */
+/*   Updated: 2021/03/18 03:53:25 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # include <sys/time.h>
 # include <pthread.h>
 # include <semaphore.h>
+# include <signal.h>
 
 # define TRUE			1
 # define FALSE			0
@@ -42,11 +43,14 @@ typedef struct			s_philo
 	int					cnt_of_eat;
 	long				time_of_last_eat;
 
-	pthread_t			thread;
+	pid_t				pid;
 	struct s_simul_info	*info;
 
 	char				time_of_last_eat_sem_name[255];
 	sem_t				*time_of_last_eat_sem;
+	
+	char				philo_full_check_sem_name[255];
+	sem_t				*philo_full_check_sem;
 
 }						t_philo;
 
@@ -61,8 +65,8 @@ typedef struct			s_simul_info
 	long				program_start_time;
 
 	int					num_of_full_philo;
-	int					somebody_dead;
-
+	int					simul_end;
+	
 	t_philo				*philo;
 
 	sem_t				*pair_fork_sem;

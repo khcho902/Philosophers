@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/08 17:20:21 by kycho             #+#    #+#             */
-/*   Updated: 2021/03/17 13:56:01 by kycho            ###   ########.fr       */
+/*   Updated: 2021/03/18 05:04:25 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@ void	destroy(t_simul_info *info)
 	while (i < info->num_of_philo)
 	{
 		sem_close(info->philo[i].time_of_last_eat_sem);
+		sem_post(info->philo[i].philo_full_check_sem);
+		sem_close(info->philo[i].philo_full_check_sem);
 		i++;
 	}
 	free(info->philo);

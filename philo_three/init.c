@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/16 21:23:16 by kycho             #+#    #+#             */
-/*   Updated: 2021/03/17 13:56:05 by kycho            ###   ########.fr       */
+/*   Updated: 2021/03/18 04:54:01 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,7 @@ void	init_sem(t_simul_info *info)
 	sem_unlink("action");
 	info->action_sem = sem_open("action", O_CREAT | O_EXCL, 0644, 1);
 	sem_unlink("num_of_full_philo");
-	info->num_of_full_philo_sem = sem_open(
-		"num_of_full_philo", O_CREAT | O_EXCL, 0644, 1);
+	info->num_of_full_philo_sem = sem_open("num_of_full_philo", O_CREAT | O_EXCL, 0644, 1);
 }
 
 int		init_philo(t_simul_info *info)
@@ -69,6 +68,15 @@ int		init_philo(t_simul_info *info)
 		sem_unlink(philo->time_of_last_eat_sem_name);
 		philo->time_of_last_eat_sem = sem_open(
 			philo->time_of_last_eat_sem_name, O_CREAT | O_EXCL, 0644, 1);
+
+		set_sem_name(
+			philo->philo_full_check_sem_name, "philo_full_check", philo->id);
+		sem_unlink(philo->philo_full_check_sem_name);
+		philo->philo_full_check_sem = sem_open(
+			philo->philo_full_check_sem_name, O_CREAT | O_EXCL, 0644, 1);
+		
+		sem_wait(philo->philo_full_check_sem);
+		
 		i++;
 	}
 	return (SUCCESS);
@@ -85,8 +93,9 @@ int		init(char **argv, t_simul_info *info)
 	else
 		info->num_of_times_each_philo_must_eat = NO_DATA;
 	info->program_start_time = gettimeofday_by_millisec();
+	info->simul_end = FALSE;
 	info->num_of_full_philo = 0;
-	info->somebody_dead = FALSE;
+	//info->somebody_dead = FALSE;
 	if (init_philo(info) == ERROR)
 		return (ERROR);
 	init_sem(info);
