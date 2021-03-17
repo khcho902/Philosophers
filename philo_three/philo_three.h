@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/08 17:31:18 by kycho             #+#    #+#             */
-/*   Updated: 2021/03/18 03:53:25 by kycho            ###   ########.fr       */
+/*   Updated: 2021/03/18 07:06:33 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ typedef struct			s_philo
 
 	char				time_of_last_eat_sem_name[255];
 	sem_t				*time_of_last_eat_sem;
-	
+
 	char				philo_full_check_sem_name[255];
 	sem_t				*philo_full_check_sem;
 
@@ -66,7 +66,7 @@ typedef struct			s_simul_info
 
 	int					num_of_full_philo;
 	int					simul_end;
-	
+
 	t_philo				*philo;
 
 	sem_t				*pair_fork_sem;
@@ -77,7 +77,7 @@ typedef struct			s_simul_info
 
 int						init(char **argv, t_simul_info *info);
 void					execute(t_simul_info *info);
-int						check_simul_end(t_simul_info *info);
+void					process_monitor(t_simul_info *info);
 char					*get_msg(int type);
 
 long					gettimeofday_by_millisec(void);

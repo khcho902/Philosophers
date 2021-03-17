@@ -6,7 +6,7 @@
 #    By: kycho <kycho@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/03/08 17:39:09 by kycho             #+#    #+#              #
-#    Updated: 2021/03/18 00:51:06 by kycho            ###   ########.fr        #
+#    Updated: 2021/03/18 07:06:10 by kycho            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,7 @@ SRCS = main.c \
 		init.c \
 		execute.c \
 		get_msg.c \
-		check_simul_end.c \
+		process_monitor.c \
 		utils.c
 OBJS = $(SRCS:.c=.o)
 

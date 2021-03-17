@@ -6,78 +6,11 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/16 21:35:23 by kycho             #+#    #+#             */
-/*   Updated: 2021/03/18 05:07:07 by kycho            ###   ########.fr       */
+/*   Updated: 2021/03/18 07:05:55 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_three.h"
-
-int		kill_process(t_simul_info *info)
-{
-	int		i;
-
-	i = 0;
-	while (i < info->num_of_philo)
-	{
-		kill(info->philo[i].pid, SIGKILL);
-		i++;
-	}
-	return (1);
-}
-
-void	*full_monitor_thread(void *arg)
-{
-	t_philo	*philo;
-	t_simul_info *info;
-
-	philo = (t_philo *)arg;
-	info = philo->info;
-
-	sem_wait(philo->philo_full_check_sem);
-
-	sem_wait(info->num_of_full_philo_sem);
-	info->num_of_full_philo++;
-	if (info->num_of_full_philo == info->num_of_philo)
-		info->simul_end = TRUE;
-	else
-		sem_post(info->action_sem);
-	sem_post(info->num_of_full_philo_sem);
-	return (NULL);
-}
-
-void	full_monitor(t_simul_info *info)
-{
-	int i;
-	pthread_t	thread;
-
-	i = 0;
-	while (i < info->num_of_philo)
-	{
-		pthread_create(&thread, NULL, full_monitor_thread, &info->philo[i]);
-		pthread_detach(thread);
-		i++;
-	}
-}
-
-void	process_monitor(t_simul_info *info)
-{
-	int			i;
-	int			status;
-
-	full_monitor(info);
-	i = 0;
-	while (info->simul_end == FALSE)
-	{
-		status = -1;
-		waitpid(info->philo[i].pid, &status, WNOHANG);
-		if (WIFEXITED(status) && WEXITSTATUS(status) == 1)
-			info->simul_end = TRUE;
-		i++;
-		if (i == info->num_of_philo)
-			i = 0;
-	}
-	kill_process(info);
-}
 
 void	philo_action(t_philo *philo, int type)
 {
@@ -152,10 +85,8 @@ void	*philo_routine(void *arg)
 	philo = (t_philo*)arg;
 	info = philo->info;
 	pthread_create(&monitor_thread, NULL, philo_monitor, philo);
-
 	if (!(philo->id % 2))
 		less_error_msleep(philo->info->time_to_eat / 2);
-
 	while (TRUE)
 	{
 		eat_proecss(philo);
@@ -176,17 +107,11 @@ void	execute(t_simul_info *info)
 	{
 		info->philo[i].pid = fork();
 		if (info->philo[i].pid == 0)
-		{
-			break;
-		}
+			break ;
 		i++;
 	}
 	if (i != info->num_of_philo)
-	{
 		philo_routine(&(info->philo[i]));
-	}
 	else
-	{
 		process_monitor(info);
-	}
 }
