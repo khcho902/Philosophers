@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/08 17:20:21 by kycho             #+#    #+#             */
-/*   Updated: 2021/03/17 00:39:25 by kycho            ###   ########.fr       */
+/*   Updated: 2021/03/17 12:42:52 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,14 +16,15 @@ void	destroy(t_simul_info *info)
 {
 	int i;
 
+	sem_close(info->pair_fork_sem);
+	sem_close(info->action_sem);
+	sem_close(info->num_of_full_philo_sem);
 	i = 0;
 	while (i < info->num_of_philo)
 	{
-		pthread_mutex_destroy(&info->fork_mutex[i]);
+		sem_close(info->philo[i].time_of_last_eat_sem);
 		i++;
 	}
-	pthread_mutex_destroy(&info->action_mutex);
-	free(info->fork_mutex);
 	free(info->philo);
 }
 

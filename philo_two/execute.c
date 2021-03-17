@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/16 21:35:23 by kycho             #+#    #+#             */
-/*   Updated: 2021/03/17 00:39:37 by kycho            ###   ########.fr       */
+/*   Updated: 2021/03/17 12:49:07 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,10 @@ void	philo_action(t_philo *philo, int type)
 	long			cur_time;
 
 	info = philo->info;
-	pthread_mutex_lock(&info->action_mutex);
+	sem_wait(info->action_sem);
 	if (check_simul_end(info) == TRUE)
 	{
-		pthread_mutex_unlock(&info->action_mutex);
+		sem_post(info->action_sem);
 		return ;
 	}
 	cur_time = gettimeofday_by_millisec();
@@ -33,7 +33,7 @@ void	philo_action(t_philo *philo, int type)
 		info->somebody_dead = TRUE;
 	printf("%7ld  %3d %s\n",
 			cur_time - info->program_start_time, philo->id, get_msg(type));
-	pthread_mutex_unlock(&info->action_mutex);
+	sem_post(info->action_sem);
 }
 
 void	*philo_monitor(void *arg)
@@ -46,16 +46,16 @@ void	*philo_monitor(void *arg)
 	info = philo->info;
 	while (check_simul_end(info) == FALSE)
 	{
-		pthread_mutex_lock(&(philo->time_of_last_eat_mutex));
+		sem_wait(philo->time_of_last_eat_sem);
 		cur_time = gettimeofday_by_millisec();
 		if (info->time_to_die < (int)(cur_time - philo->time_of_last_eat))
 		{
 			philo_action(philo, DEAD);
-			pthread_mutex_unlock(&(philo->time_of_last_eat_mutex));
+			sem_post(philo->time_of_last_eat_sem);
 			return (NULL);
 		}
-		pthread_mutex_unlock(&(philo->time_of_last_eat_mutex));
-		less_error_msleep(1);
+		sem_post(philo->time_of_last_eat_sem);
+		less_error_msleep(3);
 	}
 	return (NULL);
 }
@@ -65,23 +65,21 @@ void	eat_proecss(t_philo *philo)
 	t_simul_info *info;
 
 	info = philo->info;
-	pthread_mutex_lock(&(info->fork_mutex[philo->fork[0]]));
+	sem_wait(info->pair_fork_sem);
 	philo_action(philo, TAKEN_FORK);
-	pthread_mutex_lock(&(info->fork_mutex[philo->fork[1]]));
 	philo_action(philo, TAKEN_FORK);
-	pthread_mutex_lock(&(philo->time_of_last_eat_mutex));
+	sem_wait(philo->time_of_last_eat_sem);
 	philo_action(philo, EATING);
-	pthread_mutex_unlock(&(philo->time_of_last_eat_mutex));
+	sem_post(philo->time_of_last_eat_sem);
 	less_error_msleep(info->time_to_eat);
 	philo->cnt_of_eat++;
 	if (philo->cnt_of_eat == info->num_of_times_each_philo_must_eat)
 	{
-		pthread_mutex_lock(&(info->num_of_full_philo_mutex));
+		sem_wait(info->num_of_full_philo_sem);
 		info->num_of_full_philo++;
-		pthread_mutex_unlock(&(info->num_of_full_philo_mutex));
+		sem_post(info->num_of_full_philo_sem);
 	}
-	pthread_mutex_unlock(&(info->fork_mutex[philo->fork[0]]));
-	pthread_mutex_unlock(&(info->fork_mutex[philo->fork[1]]));
+	sem_post(info->pair_fork_sem);
 }
 
 void	*philo_routine(void *arg)

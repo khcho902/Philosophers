@@ -6,46 +6,69 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/16 21:23:16 by kycho             #+#    #+#             */
-/*   Updated: 2021/03/17 00:39:30 by kycho            ###   ########.fr       */
+/*   Updated: 2021/03/17 12:54:55 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_two.h"
 
-int		init_fork_mutex(t_simul_info *info)
+void	set_sem_name(char *dest_name, char *common_name, int id)
 {
-	int i;
+	int		i;
+	int		j;
+	char	*id_str;
 
-	info->fork_mutex = malloc(sizeof(pthread_mutex_t) * info->num_of_philo);
-	if (!info->fork_mutex)
-		return (ERROR);
 	i = 0;
-	while (i < info->num_of_philo)
+	while (common_name[i])
 	{
-		pthread_mutex_init(&(info->fork_mutex[i]), NULL);
+		dest_name[i] = common_name[i];
 		i++;
 	}
-	return (SUCCESS);
+	dest_name[i] = '_';
+	i++;
+	j = 0;
+	id_str = ft_itoa(id);
+	while (id_str[j])
+	{
+		dest_name[i + j] = id_str[j];
+		j++;
+	}
+	dest_name[i + j] = '\0';
+	free(id_str);
+}
+
+void	init_sem(t_simul_info *info)
+{
+	sem_unlink("pair_fork");
+	info->pair_fork_sem = sem_open(
+		"pair_fork", O_CREAT | O_EXCL, 0644, info->num_of_philo / 2);
+	sem_unlink("action");
+	info->action_sem = sem_open("action", O_CREAT | O_EXCL, 0644, 1);
+	sem_unlink("num_of_full_philo");
+	info->num_of_full_philo_sem = sem_open(
+		"num_of_full_philo", O_CREAT | O_EXCL, 0644, 1);
 }
 
 int		init_philo(t_simul_info *info)
 {
-	int i;
+	int		i;
+	t_philo	*philo;
 
 	if (!(info->philo = malloc(sizeof(t_philo) * info->num_of_philo)))
 		return (ERROR);
 	i = 0;
 	while (i < info->num_of_philo)
 	{
-		info->philo[i].id = i + 1;
-		info->philo[i].fork[0] = i;
-		info->philo[i].fork[1] = i + 1;
-		if (info->philo[i].fork[1] >= info->num_of_philo)
-			info->philo[i].fork[1] -= info->num_of_philo;
-		info->philo[i].cnt_of_eat = 0;
-		info->philo[i].time_of_last_eat = info->program_start_time;
-		info->philo[i].info = info;
-		pthread_mutex_init(&(info->philo[i].time_of_last_eat_mutex), NULL);
+		philo = &info->philo[i];
+		philo->id = i + 1;
+		philo->cnt_of_eat = 0;
+		philo->time_of_last_eat = info->program_start_time;
+		philo->info = info;
+		set_sem_name(
+			philo->time_of_last_eat_sem_name, "time_of_last_eat", philo->id);
+		sem_unlink(philo->time_of_last_eat_sem_name);
+		philo->time_of_last_eat_sem = sem_open(
+			philo->time_of_last_eat_sem_name, O_CREAT | O_EXCL, 0644, 1);
 		i++;
 	}
 	return (SUCCESS);
@@ -66,9 +89,6 @@ int		init(char **argv, t_simul_info *info)
 	info->somebody_dead = FALSE;
 	if (init_philo(info) == ERROR)
 		return (ERROR);
-	if (init_fork_mutex(info) == ERROR)
-		return (ERROR);
-	pthread_mutex_init(&(info->action_mutex), NULL);
-	pthread_mutex_init(&(info->num_of_full_philo_mutex), NULL);
+	init_sem(info);
 	return (SUCCESS);
 }
