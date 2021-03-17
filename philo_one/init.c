@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/16 21:23:16 by kycho             #+#    #+#             */
-/*   Updated: 2021/03/17 00:14:51 by kycho            ###   ########.fr       */
+/*   Updated: 2021/03/18 06:22:53 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,8 @@ int		init_fork_mutex(t_simul_info *info)
 	i = 0;
 	while (i < info->num_of_philo)
 	{
-		pthread_mutex_init(&(info->fork_mutex[i]), NULL);
+		if (pthread_mutex_init(&(info->fork_mutex[i]), NULL))
+			return (ERROR);
 		i++;
 	}
 	return (SUCCESS);
@@ -45,7 +46,8 @@ int		init_philo(t_simul_info *info)
 		info->philo[i].cnt_of_eat = 0;
 		info->philo[i].time_of_last_eat = info->program_start_time;
 		info->philo[i].info = info;
-		pthread_mutex_init(&(info->philo[i].time_of_last_eat_mutex), NULL);
+		if (pthread_mutex_init(&(info->philo[i].time_of_last_eat_mutex), NULL))
+			return (ERROR);
 		i++;
 	}
 	return (SUCCESS);
@@ -53,7 +55,8 @@ int		init_philo(t_simul_info *info)
 
 int		init(char **argv, t_simul_info *info)
 {
-	info->num_of_philo = ft_atoi(argv[1]);
+	if ((info->num_of_philo = ft_atoi(argv[1])) < 2)
+		return (ERROR);
 	info->time_to_die = ft_atoi(argv[2]);
 	info->time_to_eat = ft_atoi(argv[3]);
 	info->time_to_sleep = ft_atoi(argv[4]);
@@ -68,7 +71,9 @@ int		init(char **argv, t_simul_info *info)
 		return (ERROR);
 	if (init_fork_mutex(info) == ERROR)
 		return (ERROR);
-	pthread_mutex_init(&(info->action_mutex), NULL);
-	pthread_mutex_init(&(info->num_of_full_philo_mutex), NULL);
+	if (pthread_mutex_init(&(info->action_mutex), NULL))
+		return (ERROR);
+	if (pthread_mutex_init(&(info->num_of_full_philo_mutex), NULL))
+		return (ERROR);
 	return (SUCCESS);
 }

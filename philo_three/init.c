@@ -6,7 +6,7 @@
 /*   By: kycho <kycho@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/16 21:23:16 by kycho             #+#    #+#             */
-/*   Updated: 2021/03/18 04:54:01 by kycho            ###   ########.fr       */
+/*   Updated: 2021/03/18 06:40:16 by kycho            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,8 @@ int		init_philo(t_simul_info *info)
 
 int		init(char **argv, t_simul_info *info)
 {
-	info->num_of_philo = ft_atoi(argv[1]);
+	if ((info->num_of_philo = ft_atoi(argv[1])) < 2)
+		return (ERROR);
 	info->time_to_die = ft_atoi(argv[2]);
 	info->time_to_eat = ft_atoi(argv[3]);
 	info->time_to_sleep = ft_atoi(argv[4]);
